@@ -1,0 +1,21 @@
+# Pipeline
+pipeline:
+    pattern: /pipeline(/id)
+    controller: Pipeline
+    extra:
+        layout: pipeline
+        menu:
+            mainmenu: pipelines
+
+# Pipelines
+pipelines:
+    pattern: /pipelines(/page)
+    controller: Pipelines
+    action:
+        post: CopyController
+        patch: BatchController
+        put: FilterController
+    extra:
+        layout: pipelines
+        menu:
+            mainmenu: pipelines

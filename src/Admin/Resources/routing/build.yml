@@ -1,0 +1,21 @@
+# Build
+build:
+    pattern: /build(/id)
+    controller: Build
+    extra:
+        layout: build
+        menu:
+            mainmenu: builds
+
+# Builds
+builds:
+    pattern: /builds(/page)
+    controller: Builds
+    action:
+        post: CopyController
+        patch: BatchController
+        put: FilterController
+    extra:
+        layout: builds
+        menu:
+            mainmenu: builds

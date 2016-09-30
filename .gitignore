@@ -1,0 +1,16 @@
+# System
+.*
+!.gitignore
+!.gitkeep
+!.htaccess
+!web.config
+
+# Composer
+/vendor
+
+# Windwalker
+/etc/secret.yml
+
+#Test
+/phpunit.xml
+/phpunit.core.xml
