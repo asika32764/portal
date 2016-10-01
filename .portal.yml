@@ -1,7 +1,7 @@
 title: Portal
 public: /www
 parses:
-  - etc/review/secret.portal.yml
+  - etc/secret.portal.yml
 scripts:
   - copy etc\secret.portal.yml etc\secret.yml
   - composer install
