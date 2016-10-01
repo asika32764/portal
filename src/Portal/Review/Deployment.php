@@ -96,23 +96,16 @@ class Deployment
 			$deployment = $this->createDeployment($sha);
 		}
 
-//		BuildMapper::updateOne(['status' => BuildHelper::STATUS_PENDING, 'id' => $build->id]);
-
 		try
 		{
 			$buildID = ($build->type === BuildHelper::TYPE_PR) ? $build->number : $build->branch;
 
 			// Do deploy
 			$name = BuildHelper::getBuildName($build->type, $buildID);
-			$logName = 'build.' . $name;
-//			Logger::debug($logName, 'prepare');
 			$this->log('Prepare deployment.');
 
 			$path = BuildHelper::getBuildPath($this->user . '/' . $this->repo, $build->type, $buildID);
-//			Logger::debug($logName, 'Path:' . $path);
 			$this->log('Target path: ' . $path);
-
-//			Logger::debug($logName, 'Git clone');
 
 			// Create DB
 			$dbname = 'review_' . $name;
@@ -204,13 +197,13 @@ class Deployment
 			}
 
 			$build->status = 'error';
-
-//			BuildMapper::updateOne(['status' => BuildHelper::STATUS_ERROR, 'id' => $build->id]);
 		}
 		finally
 		{
 			$build->logs = implode("\n", $this->logs);
 			$build->store();
+
+			file_put_contents(WINDWALKER_LOGS . '/lasi-build.log', $build->logs);
 
 			return $this->logs;
 		}
