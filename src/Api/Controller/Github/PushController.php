@@ -8,17 +8,14 @@
 
 namespace Api\Controller\Github;
 
-use Admin\AdminPackage;
 use Admin\DataMapper\BuildMapper;
 use Admin\DataMapper\PipelineMapper;
 use Admin\Model\BuildModel;
 use Admin\Record\PipelineRecord;
 use Portal\Review\BuildHelper;
-use Portal\Review\Deployment;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Data\Data;
 use Windwalker\Structure\Structure;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The PushController class.
@@ -27,6 +24,8 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class PushController extends AbstractController
 {
+	use DeployControllerTrait;
+
 	/**
 	 * Do execute action.
 	 *
@@ -51,51 +50,8 @@ class PushController extends AbstractController
 		$branch = explode('/', $data['ref']);
 		$branch = array_pop($branch);
 
-		$build = BuildMapper::findOne(['pipeline_id' => $pipeline->id, 'type' => BuildHelper::TYPE_BRANCH, 'branch' => $branch]);
+		$build = $this->createBuild($pipeline->id, $branch, BuildHelper::TYPE_BRANCH);
 
-		if ($build->isNull())
-		{
-			$build = $this->createBuild($data, $pipeline, $branch);
-		}
-
-		// Deploy
-		$sha = $data['after'];
-
-		/** @var Deployment $deploy */
-		$deploy = $this->container->newInstance(Deployment::class, ['pipeline' => $pipeline]);
-		return $deploy->deploy($build, $sha);
-	}
-
-	/**
-	 * createBuild
-	 *
-	 * @param Structure      $data
-	 * @param PipelineRecord $pipeline
-	 * @param string         $branch
-	 *
-	 * @return Data
-	 */
-	protected function createBuild(Structure $data, PipelineRecord $pipeline, $branch)
-	{
-		$this->getPackage()
-			->getMvcResolver()
-			->getModelResolver()
-			->addNamespace(ReflectionHelper::getNamespaceName(AdminPackage::class) . '/Model');
-
-		// Create build
-		/** @var BuildModel $model */
-		$model = $this->getModel('Build');
-
-		$build = new Data([
-			'pipeline_id' => $pipeline->id,
-			'branch' => $branch,
-			'type'   => BuildHelper::TYPE_BRANCH,
-			'url'    => $data['commits.url'],
-			'detail' => $data->toString(),
-		]);
-
-		$model->save($build);
-
-		return $build;
+		return $this->processDeploy($build, $repo, $branch, BuildHelper::TYPE_BRANCH);
 	}
 }

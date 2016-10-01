@@ -8,18 +8,10 @@
 
 namespace Api\Controller\Github;
 
-use Admin\AdminPackage;
-use Admin\DataMapper\BuildMapper;
 use Admin\DataMapper\PipelineMapper;
-use Admin\Model\BuildModel;
-use Admin\Table\Table;
-use Github\Client;
 use Portal\Review\BuildHelper;
-use Portal\Review\Deployment;
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Data\Data;
 use Windwalker\Structure\Structure;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The PullRequestController class.
@@ -28,6 +20,8 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class PullRequestController extends AbstractController
 {
+	use DeployControllerTrait;
+
 	const ACTION_OPENED = 'opened';
 	const ACTION_SYNCHRONIZE = 'synchronize';
 
@@ -54,15 +48,9 @@ class PullRequestController extends AbstractController
 	 */
 	protected function opened(Structure $data)
 	{
-		$this->getPackage()
-			->getMvcResolver()
-			->getModelResolver()
-			->addNamespace(ReflectionHelper::getNamespaceName(AdminPackage::class) . '/Model');
+		$this->registerModelPath();
 
 		// Create build
-		/** @var BuildModel $model */
-		$model = $this->getModel('Build');
-
 		$repo = $data['repository.full_name'];
 
 		// Find pipeline
@@ -73,13 +61,7 @@ class PullRequestController extends AbstractController
 			throw new \RuntimeException('Pipeline for ' . $repo . ' not found.');
 		}
 
-		$model->save(new Data([
-			'pipeline_id' => $pipeline->id,
-			'number' => $data['pull_request.number'],
-			'type'   => BuildHelper::TYPE_PR,
-			'url'    => $data['pull_request.url'],
-			'detail' => $data->toString(),
-		]));
+		$this->createBuild($pipeline->id, $data['pull_request.number'], BuildHelper::TYPE_PR);
 
 		return $this->synchronize($data);
 	}
@@ -93,26 +75,10 @@ class PullRequestController extends AbstractController
 	 */
 	protected function synchronize(Structure $data)
 	{
-		$sha = $data['pull_request.head.sha'];
-
 		$repo = $data['repository.full_name'];
 		$number = $data['pull_request.number'];
 
-		$pipeline = PipelineMapper::findOne(['github' => $repo]);
-
-		if ($pipeline->isNull())
-		{
-			throw new \RuntimeException("No pipeline for: $repo");
-		}
-
-		$build = BuildMapper::findOne([
-				'pipeline_id' => $pipeline->id,
-				'number' => $number,
-				'type' => BuildHelper::TYPE_PR
-			]);
-
-		$deploy = $this->container->newInstance(Deployment::class, ['pipeline' => $pipeline]);
-		$deploy->deploy($build, $sha);
+		$this->processDeploy($data, $repo, $number, BuildHelper::TYPE_PR);
 
 //		$params = [
 //			'state' => 'success',
@@ -129,4 +95,6 @@ class PullRequestController extends AbstractController
 //			'description' => 'Hello World'
 //		]);
 	}
+
+
 }

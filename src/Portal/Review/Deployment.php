@@ -84,10 +84,12 @@ class Deployment
 	/**
 	 * deploy
 	 *
-	 * @param Data|BuildDataTrait $build
-	 * @param string              $sha
+	 * @param BuildRecord $build
+	 * @param string      $sha
+	 *
+	 * @return array
 	 */
-	public function deploy(Data $build, $sha)
+	public function deploy(BuildRecord $build, $sha)
 	{
 		if ($build->type === BuildHelper::TYPE_PR)
 		{
@@ -166,19 +168,28 @@ class Deployment
 			}
 
 			// Run Scripts
-			$this->log('>> ' . 'start /b php windwalker github deploy ' . $path);
-			$proc = new Process('start /b php ' . WINDWALKER_ROOT . '/windwalker github deploy ' . $path);
-			$proc->run(function ($type, $buffer)
+			$scripts = (array) $config->get('scripts');
+
+			foreach ($scripts as $i => $script)
 			{
-				if ($type == Process::ERR)
+				if (!is_string($script))
 				{
-					$this->log($buffer, 'error');
+					throw new \RuntimeException('Script line: ' . ($i + 1) . ' not a string');
 				}
-				else
-				{
-					$this->log($buffer);
-				}
-			});
+
+				$this->run($script, $path);
+			}
+
+			if ($build->type === BuildHelper::TYPE_PR)
+			{
+				$deployment = $this->updateDeployment(
+					$deployment['id'],
+					BuildHelper::STATUS_SUCCESS,
+					BuildHelper::getBuildUrl($this->user . '/' . $this->repo, $build->type, $buildID)
+				);
+			}
+
+			$build->status = 'success';
 		}
 		catch (\Exception $e)
 		{
@@ -192,21 +203,17 @@ class Deployment
 				);
 			}
 
+			$build->status = 'error';
+
 //			BuildMapper::updateOne(['status' => BuildHelper::STATUS_ERROR, 'id' => $build->id]);
+		}
+		finally
+		{
+			$build->logs = implode("\n", $this->logs);
+			$build->store();
 
 			return $this->logs;
 		}
-
-		if ($build->type === BuildHelper::TYPE_PR)
-		{
-			$deployment = $this->updateDeployment(
-				$deployment['id'],
-				BuildHelper::STATUS_SUCCESS,
-				BuildHelper::getBuildUrl($this->user . '/' . $this->repo, $build->type, $buildID)
-			);
-		}
-
-		return $this->logs;
 	}
 
 	/**
