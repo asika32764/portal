@@ -16,7 +16,8 @@
         "swiftmailer/swiftmailer": "~5.0",
         "lyrasoft/luna": "~1.1",
         "knplabs/github-api": "^1.7",
-        "php-http/guzzle6-adapter": "^1.1"
+        "php-http/guzzle6-adapter": "^1.1",
+        "symfony/process": "3.*"
     },
     "require-dev": {
     },

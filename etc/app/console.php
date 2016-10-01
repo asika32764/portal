@@ -64,6 +64,7 @@ return ArrayHelper::merge(include __DIR__ . '/windwalker.php', [
 			//'migration' => \Windwalker\Core\Migration\Command\MigrationCommand::class,
 			//'seed'      => \Windwalker\Core\Seeder\Command\SeedCommand::class,
 			//'package'   => \Windwalker\Core\Package\Command\PackageCommand::class
+			'github' => \Api\Command\GithubCommand::class
 		]
 	],
 

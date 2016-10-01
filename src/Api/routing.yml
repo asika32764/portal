@@ -1,0 +1,6 @@
+
+hook:
+    pattern: /github/webhook
+    controller: Github
+    action:
+        '*': HookController

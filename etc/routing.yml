@@ -2,10 +2,15 @@
 #    pattern: /
 #    package: main
 
-front:
-    pattern: /
-    package: front
+#front:
+#    pattern: /
+#    package: front
 
 admin:
-    pattern: /admin
+    pattern: /
     package: admin
+
+# Routing of package: api
+api:
+    pattern: /api
+    package: api
