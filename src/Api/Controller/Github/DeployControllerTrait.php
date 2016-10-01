@@ -84,15 +84,19 @@ trait DeployControllerTrait
 	 * @param string $name
 	 * @param string $type
 	 *
-	 * @return  boolean
+	 * @return  Data
 	 */
 	protected function createBuild($pipelineId, $name, $type)
 	{
+		$this->registerModelPath();
+
 		$key = $type == BuildHelper::TYPE_PR ? 'number' : 'branch';
 
-		if (BuildMapper::findOne(['pipeline_id' => $pipelineId, $key => $name])->notNull())
+		$build = BuildMapper::findOne(['pipeline_id' => $pipelineId, $key => $name]);
+
+		if (!$build->isNull())
 		{
-			return true;
+			return $build;
 		}
 
 		$data = new Data([

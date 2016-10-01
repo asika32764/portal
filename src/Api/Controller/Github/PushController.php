@@ -50,8 +50,8 @@ class PushController extends AbstractController
 		$branch = explode('/', $data['ref']);
 		$branch = array_pop($branch);
 
-		$build = $this->createBuild($pipeline->id, $branch, BuildHelper::TYPE_BRANCH);
+		$this->createBuild($pipeline->id, $branch, BuildHelper::TYPE_BRANCH);
 
-		return $this->processDeploy($build, $repo, $branch, BuildHelper::TYPE_BRANCH);
+		return $this->processDeploy($data, $repo, $branch, BuildHelper::TYPE_BRANCH);
 	}
 }

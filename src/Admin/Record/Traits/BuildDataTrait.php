@@ -18,6 +18,8 @@ namespace Admin\Record\Traits;
  * @property    string  branch
  * @property    string  url
  * @property    string  detail
+ * @property    string  status
+ * @property    string  logs
  * @property    string  created
  * @property    string  created_by
  * @property    string  modified

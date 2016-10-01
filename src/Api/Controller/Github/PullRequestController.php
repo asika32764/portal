@@ -48,8 +48,6 @@ class PullRequestController extends AbstractController
 	 */
 	protected function opened(Structure $data)
 	{
-		$this->registerModelPath();
-
 		// Create build
 		$repo = $data['repository.full_name'];
 
