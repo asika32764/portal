@@ -34,7 +34,7 @@ class BuildRecord extends Record
 	 *
 	 * @var  string
 	 */
-	protected $keys = 'id';
+	protected $keys = ['id'];
 
 	/**
 	 * onAfterLoad

@@ -28,8 +28,12 @@ class BuildInit extends AbstractMigration
 			$schema->primary('id')->comment('Primary Key');
 			$schema->integer('pipeline_id')->comment('Pipeline ID');
 			$schema->char('type')->length(10)->comment('pr, branch');
+			$schema->integer('number')->comment('PR Number');
+			$schema->varchar('branch')->comment('Branch');
 			$schema->varchar('url')->comment('URL');
 			$schema->text('detail')->comment('Detail Text');
+			$schema->char('status')->comment('pending, success, error, failure');
+			$schema->longtext('logs')->comment('Logs');
 			$schema->datetime('created')->comment('Created Date');
 			$schema->varchar('created_by')->comment('Author');
 			$schema->datetime('modified')->comment('Modified Date');
@@ -37,6 +41,8 @@ class BuildInit extends AbstractMigration
 			$schema->text('params')->comment('Params');
 
 			$schema->addIndex('pipeline_id');
+			$schema->addIndex('number');
+			$schema->addIndex('branch');
 			$schema->addIndex('type');
 			$schema->addIndex('created_by');
 		});

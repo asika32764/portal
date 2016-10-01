@@ -25,13 +25,13 @@ if (is_file(WINDWALKER_ETC . '/secret.yml'))
 }
 
 // Get allow remote ips from config.
-if (isset($_SERVER['HTTP_CLIENT_IP']) || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-	|| !(in_array(@$_SERVER['REMOTE_ADDR'], (array) $config->get('dev.allow_ips', ['127.0.0.1', '::1', 'fe80::1']))))
-{
-	header('HTTP/1.1 403 Forbidden');
-
-	exit('Forbidden');
-}
+//if (isset($_SERVER['HTTP_CLIENT_IP']) || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+//	|| !(in_array(@$_SERVER['REMOTE_ADDR'], (array) $config->get('dev.allow_ips', ['127.0.0.1', '::1', 'fe80::1']))))
+//{
+//	header('HTTP/1.1 403 Forbidden');
+//
+//	exit('Forbidden');
+//}
 
 // Start our application.
 $app = new Windwalker\Web\DevApplication;
