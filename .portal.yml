@@ -3,6 +3,6 @@ public: /www
 parses:
   - etc/review/secret.portal.yml
 scripts:
-  - cp etc/review/secret.portal.yml etc/secret.yml
+  - copy etc/review/secret.portal.yml etc/secret.yml
   - composer install
   - php windwalker run preparedev
